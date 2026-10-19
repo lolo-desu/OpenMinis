@@ -175,17 +175,29 @@ static int weather_handler(int argc, char **argv,
     }
 
     // Call Swift bridge for weather data
+    if (@available(iOS 16.0, *)) {
+        // WeatherKit is available
+    } else {
+        NSDictionary *err = noff_json_error(TOOL_NAME, subcmd,
+                                             NOFF_ERR_NOT_AVAILABLE,
+                                             @"WeatherKit requires iOS 16.0 or later.");
+        noff_emit_json(stdout_fd, err, compact, quiet);
+        return NOFF_EXIT_NOT_AVAILABLE;
+    }
+
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     __block NSDictionary *weatherData = nil;
     __block NSError *weatherError = nil;
 
-    [WeatherOffloadBridge fetchWeatherForLatitude:loc.coordinate.latitude
-                                       longitude:loc.coordinate.longitude
-                                      completion:^(NSDictionary *result, NSError *error) {
-        weatherData = result;
-        weatherError = error;
-        dispatch_semaphore_signal(sem);
-    }];
+    if (@available(iOS 16.0, *)) {
+        [WeatherOffloadBridge fetchWeatherForLatitude:loc.coordinate.latitude
+                                           longitude:loc.coordinate.longitude
+                                          completion:^(NSDictionary *result, NSError *error) {
+            weatherData = result;
+            weatherError = error;
+            dispatch_semaphore_signal(sem);
+        }];
+    }
 
     dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC));
 

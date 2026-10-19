@@ -760,7 +760,12 @@ final class CrashReporter: NSObject, MXMetricManagerSubscriber {
 
             if let hangDiags = payload.hangDiagnostics, !hangDiags.isEmpty {
                 for diag in hangDiags {
-                    let durationMs = diag.hangDuration.converted(to: .milliseconds).value
+                    let durationMs: Double
+                    if #available(iOS 16.0, *) {
+                        durationMs = diag.hangDuration.converted(to: .milliseconds).value
+                    } else {
+                        durationMs = 0
+                    }
                     let type = "Hang: \(String(format: "%.0f", durationMs))ms"
                     var stack: String?
                     let data = diag.callStackTree.jsonRepresentation()

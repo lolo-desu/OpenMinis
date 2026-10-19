@@ -3259,10 +3259,10 @@ struct ContentView: View {
                     }
                 }
             }
-            .background(
-                NavigationLink(value: session.id) { EmptyView() }
-                    .opacity(0)
-            )
+            .contentShape(Rectangle())
+            .onTapGesture {
+                openSession(session.id)
+            }
             .listRowInsets(EdgeInsets())
             .listRowSeparator(.hidden)
             .listRowBackground(Group {
@@ -4410,7 +4410,7 @@ struct ContentView: View {
             Section {
                 ForEach(entry.ids, id: \.self) { sessionId in
                     if let session = byId["\(entry.deviceId):\(sessionId)"] {
-                        NavigationLink(value: "remote:\(entry.deviceId):\(session.id)") {
+                        CompatValueNavigationLink(value: "remote:\(entry.deviceId):\(session.id)") {
                             RemoteSessionRow(session: session)
                         }
                         .listRowInsets(EdgeInsets())

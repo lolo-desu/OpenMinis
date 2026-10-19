@@ -576,7 +576,11 @@ struct MinisApp: App {
                 debugServer.restartIfDead(port: 8321)
                 #endif
 
-                try? await UNUserNotificationCenter.current().setBadgeCount(0)
+                if #available(iOS 16.0, *) {
+                    try? await UNUserNotificationCenter.current().setBadgeCount(0)
+                } else {
+                    UIApplication.shared.applicationIconBadgeNumber = 0
+                }
                 BackgroundInterruptionTracker.shared.checkOnForeground()
                 // [T-shortcuts-diag-and-pending] Scan for AppIntent runs that
                 // were marked pending but never cleared (i.e. the process was
@@ -879,6 +883,7 @@ struct MinisApp: App {
             let alreadyRegistered = domains.contains { $0.identifier == fileProviderDomain.identifier }
 
             if needsForceReset && alreadyRegistered {
+                guard #available(iOS 16.0, *) else { return }
                 // One-time aggressive reset. The default `remove(_:)` only
                 // unregisters the domain — iOS Files keeps its cached
                 // metadata (including any "paused" flag) keyed on the same

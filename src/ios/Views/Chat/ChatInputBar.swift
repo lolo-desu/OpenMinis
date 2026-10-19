@@ -604,6 +604,7 @@ private struct AttachmentPreviewView: UIViewControllerRepresentable {
 
 // MARK: - Video File Transferable (for PhotosPicker video export)
 
+@available(iOS 16.0, *)
 struct VideoFileTransferable: Transferable {
     let url: URL
 
