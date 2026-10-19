@@ -943,6 +943,7 @@
 		E5G000012 /* AgentLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentLiveActivityManager.swift; sourceTree = "<group>"; };
 		E5G000013 /* EnhancedBackgroundSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedBackgroundSettingsView.swift; sourceTree = "<group>"; };
 		E5G000014 /* AgentActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentActivityAttributes.swift; sourceTree = "<group>"; };
+		E5IOS150011 /* iOS15Compatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOS15Compatibility.swift; sourceTree = "<group>"; };
 		E5GWF0013 /* GeminiWireFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiWireFormat.swift; sourceTree = "<group>"; };
 		E5H000010 /* AgentWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AgentWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5H000011 /* AgentWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentWidgetBundle.swift; sourceTree = "<group>"; };

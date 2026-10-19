@@ -1378,7 +1378,7 @@ extension CollectionViewMessageListV3 {
                 let message = messages[msgIdx]
                 let bridge = getOrCreateBridge(for: message, in: messages)
                 cell.backgroundColor = .clear
-                let config = UIHostingConfiguration {
+                let config = CompatHostingContentConfiguration {
                     BridgedWholeMessageV3(
                         message: message,
                         bridge: bridge,
@@ -1410,7 +1410,7 @@ extension CollectionViewMessageListV3 {
                 guard let msgIdx = messageIndex[msgId], msgIdx < messages.count else { return }
                 let message = messages[msgIdx]
                 cell.backgroundColor = .clear
-                let config = UIHostingConfiguration {
+                let config = CompatHostingContentConfiguration {
                     BridgedAssistantHeaderV3(message: message, maxWidth: width,
                                             onOpenSoulSettings: onOpenSoulSettings)
                         .transaction { $0.disablesAnimations = true }
@@ -1430,7 +1430,7 @@ extension CollectionViewMessageListV3 {
                 }
                 let bridge = getOrCreateBridge(for: message, in: messages)
                 cell.backgroundColor = .clear
-                let config = UIHostingConfiguration {
+                let config = CompatHostingContentConfiguration {
                     BridgedAssistantBlockV3(
                         block: block,
                         message: message,
@@ -1447,7 +1447,7 @@ extension CollectionViewMessageListV3 {
                 let message = messages[msgIdx]
                 let bridge = getOrCreateBridge(for: message, in: messages)
                 cell.backgroundColor = .clear
-                let config = UIHostingConfiguration {
+                let config = CompatHostingContentConfiguration {
                     BridgedAssistantFooterV3(
                         message: message,
                         bridge: bridge,

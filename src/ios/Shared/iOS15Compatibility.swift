@@ -3,9 +3,9 @@ import UIKit
 import PhotosUI
 import UniformTypeIdentifiers
 
-// MARK: - 1. Task.sleep(for:) Backport for iOS 15
+// MARK: - 1. Task.sleep(for:) & Duration Backport for iOS 15
 
-public enum iOS15Duration: Sendable {
+public enum iOS15Duration: Sendable, Equatable {
     case nanoseconds(Int64)
     case microseconds(Int64)
     case milliseconds(Int64)
@@ -29,6 +29,8 @@ public enum iOS15Duration: Sendable {
     }
 }
 
+public typealias Duration = iOS15Duration
+
 extension Task where Success == Never, Failure == Never {
     @_disfavoredOverload
     public static func sleep(for duration: iOS15Duration) async throws {
@@ -36,24 +38,36 @@ extension Task where Success == Never, Failure == Never {
     }
 }
 
-// MARK: - 2. ToolbarItemPlacement Backports (.topBarLeading / .topBarTrailing / .bottomBar)
+// MARK: - 2. ToolbarItemPlacement & Toolbar Visibility Backports
 
 extension ToolbarItemPlacement {
     @_disfavoredOverload
     public static var topBarLeading: ToolbarItemPlacement {
-        if #available(iOS 16.0, *) {
-            return .navigationBarLeading
-        }
-        return .navigationBarLeading
+        .navigationBarLeading
     }
 
     @_disfavoredOverload
     public static var topBarTrailing: ToolbarItemPlacement {
-        if #available(iOS 16.0, *) {
-            return .navigationBarTrailing
-        }
-        return .navigationBarTrailing
+        .navigationBarTrailing
     }
+
+    @_disfavoredOverload
+    public static var secondaryAction: ToolbarItemPlacement {
+        .navigationBarTrailing
+    }
+}
+
+public enum CompatToolbarPlacement: Hashable, Sendable {
+    case automatic
+    case navigationBar
+    case bottomBar
+    case tabBar
+}
+
+public enum CompatToolbarVisibility: Hashable, Sendable {
+    case automatic
+    case visible
+    case hidden
 }
 
 // MARK: - 3. LabeledContent Backport for iOS 15
@@ -147,7 +161,7 @@ private struct CompatActivityView: UIViewControllerRepresentable {
 
 public typealias ShareLink = CompatShareLink
 
-// MARK: - 5. AnyShape & UnevenRoundedRectangle Backport for iOS 15
+// MARK: - 5. AnyShape & UnevenRoundedRectangle & Color.gradient Backports
 
 public struct CompatAnyShape: Shape {
     private let _path: @Sendable (CGRect) -> Path
@@ -214,6 +228,20 @@ public struct CompatUnevenRoundedRectangle: Shape {
 
 public typealias UnevenRoundedRectangle = CompatUnevenRoundedRectangle
 
+extension Color {
+    @_disfavoredOverload
+    public var gradient: LinearGradient {
+        LinearGradient(colors: [self.opacity(0.85), self], startPoint: .top, endPoint: .bottom)
+    }
+}
+
+extension HorizontalAlignment {
+    @_disfavoredOverload
+    public static var listRowSeparatorLeading: HorizontalAlignment {
+        .leading
+    }
+}
+
 // MARK: - 6. PresentationDetent & View Modifiers Backport for iOS 15
 
 public enum CompatPresentationDetent: Hashable, Sendable {
@@ -239,11 +267,20 @@ public enum CompatScrollIndicatorVisibility: Hashable, Sendable {
     case never
 }
 
-public enum CompatToolbarPlacement: Hashable, Sendable {
-    case automatic
-    case navigationBar
-    case bottomBar
-    case tabBar
+private struct CompatOnGeometryChangeModifier<T: Equatable>: ViewModifier {
+    let transform: (GeometryProxy) -> T
+    let action: (T) -> Void
+
+    func body(content: Content) -> some View {
+        content.background(
+            GeometryReader { proxy in
+                let val = transform(proxy)
+                Color.clear
+                    .onAppear { action(val) }
+                    .onChange(of: val) { newVal in action(newVal) }
+            }
+        )
+    }
 }
 
 extension View {
@@ -347,6 +384,16 @@ extension View {
 
     @_disfavoredOverload
     @ViewBuilder
+    public func toolbar(_ visibility: Visibility, for bars: CompatToolbarPlacement...) -> some View {
+        if #available(iOS 16.0, *) {
+            self.toolbar(visibility, for: .navigationBar)
+        } else {
+            self.navigationBarHidden(visibility == .hidden)
+        }
+    }
+
+    @_disfavoredOverload
+    @ViewBuilder
     public func persistentSystemOverlays(_ visibility: Visibility) -> some View {
         if #available(iOS 16.0, *) {
             self.persistentSystemOverlays(visibility)
@@ -373,6 +420,48 @@ extension View {
         } else {
             self.font(Font.body.bold())
         }
+    }
+
+    @_disfavoredOverload
+    @ViewBuilder
+    public func lineLimit(_ limit: ClosedRange<Int>) -> some View {
+        if #available(iOS 16.0, *) {
+            self.lineLimit(limit)
+        } else {
+            self.lineLimit(limit.upperBound)
+        }
+    }
+
+    @_disfavoredOverload
+    @ViewBuilder
+    public func navigationSplitViewColumnWidth(min: CGFloat? = nil, ideal: CGFloat, max: CGFloat? = nil) -> some View {
+        if #available(iOS 16.0, *) {
+            self.navigationSplitViewColumnWidth(min: min, ideal: ideal, max: max)
+        } else {
+            self
+        }
+    }
+
+    @_disfavoredOverload
+    @ViewBuilder
+    public func contextMenu<M: View, P: View>(
+        @ViewBuilder menuItems: () -> M,
+        @ViewBuilder preview: () -> P
+    ) -> some View {
+        if #available(iOS 16.0, *) {
+            self.contextMenu(menuItems: menuItems, preview: preview)
+        } else {
+            self.contextMenu(menuItems: menuItems)
+        }
+    }
+
+    @_disfavoredOverload
+    public func onGeometryChange<T: Equatable>(
+        for type: T.Type,
+        of transform: @escaping (GeometryProxy) -> T,
+        action: @escaping (T) -> Void
+    ) -> some View {
+        self.modifier(CompatOnGeometryChangeModifier(transform: transform, action: action))
     }
 
     @_disfavoredOverload
@@ -413,12 +502,6 @@ public enum CompatGlassShape: Sendable {
     case circle
 }
 
-public enum CompatToolbarVisibility: Sendable {
-    case automatic
-    case visible
-    case hidden
-}
-
 extension View {
     @_disfavoredOverload
     public func glassEffect(_ glass: Glass = .regular, in shape: CompatGlassShape) -> some View {
@@ -446,15 +529,58 @@ extension View {
     }
 
     @_disfavoredOverload
+    @ViewBuilder
     public func contentShape(_ shape: CompatGlassShape) -> some View {
         switch shape {
         case .capsule:
-            return AnyView(self.contentShape(Capsule()))
+            self.contentShape(Capsule())
         case .circle:
-            return AnyView(self.contentShape(Circle()))
+            self.contentShape(Circle())
         }
     }
 }
+
+// MARK: - 6c. TextField(axis:) Backport for iOS 15
+
+public enum CompatAxis: Hashable, Sendable {
+    case horizontal
+    case vertical
+}
+
+extension TextField where Label == Text {
+    @_disfavoredOverload
+    public init(_ titleKey: LocalizedStringKey, text: Binding<String>, axis: CompatAxis) {
+        self.init(titleKey, text: text)
+    }
+
+    @_disfavoredOverload
+    public init<S: StringProtocol>(_ title: S, text: Binding<String>, axis: CompatAxis) {
+        self.init(title, text: text)
+    }
+}
+
+// MARK: - 6d. ProposedViewSize Backport for UIViewRepresentable on iOS 15
+
+public struct CompatProposedViewSize: Equatable, Sendable {
+    public var width: CGFloat?
+    public var height: CGFloat?
+
+    public static let zero = CompatProposedViewSize(width: 0, height: 0)
+    public static let unspecified = CompatProposedViewSize(width: nil, height: nil)
+    public static let infinity = CompatProposedViewSize(width: .infinity, height: .infinity)
+
+    public init(width: CGFloat?, height: CGFloat?) {
+        self.width = width
+        self.height = height
+    }
+
+    public init(_ size: CGSize) {
+        self.width = size.width
+        self.height = size.height
+    }
+}
+
+public typealias ProposedViewSize = CompatProposedViewSize
 
 // MARK: - 7. NavigationStack & NavigationSplitView Backport for iOS 15
 
@@ -788,5 +914,73 @@ extension View {
                 selection.wrappedValue = items.first
             }
         }
+    }
+}
+
+// MARK: - 9. iOS 15 Hosting Content Configuration Backport (for UICollectionViewCell)
+
+public final class CompatHostingContentConfiguration<Content: View>: NSObject, UIContentConfiguration {
+    public let rootView: Content
+
+    public init(@ViewBuilder content: () -> Content) {
+        self.rootView = content()
+    }
+
+    public func minSize(width: CGFloat = 0, height: CGFloat = 0) -> Self { self }
+    public func margins(_ edges: Edge.Set = .all, _ length: CGFloat = 0) -> Self { self }
+
+    public func makeContentView() -> UIView & UIContentView {
+        CompatHostingContentView(configuration: self)
+    }
+
+    public func updated(for state: UIConfigurationState) -> Self {
+        self
+    }
+}
+
+private final class CompatHostingContentView<Content: View>: UIView, UIContentView {
+    var configuration: UIContentConfiguration {
+        didSet {
+            if let config = configuration as? CompatHostingContentConfiguration<Content> {
+                hostingController.rootView = config.rootView
+                hostingController.view.invalidateIntrinsicContentSize()
+                setNeedsLayout()
+            }
+        }
+    }
+
+    private let hostingController: UIHostingController<Content>
+
+    init(configuration: CompatHostingContentConfiguration<Content>) {
+        self.configuration = configuration
+        self.hostingController = UIHostingController(rootView: configuration.rootView)
+        super.init(frame: .zero)
+        backgroundColor = .clear
+        hostingController.view.backgroundColor = .clear
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(hostingController.view)
+        NSLayoutConstraint.activate([
+            hostingController.view.topAnchor.constraint(equalTo: topAnchor),
+            hostingController.view.leadingAnchor.constraint(equalTo: leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: trailingAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func systemLayoutSizeFitting(
+        _ targetSize: CGSize,
+        withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
+        verticalFittingPriority: UILayoutPriority
+    ) -> CGSize {
+        let target = CGSize(
+            width: targetSize.width > 0 ? targetSize.width : UIScreen.main.bounds.width,
+            height: UIView.layoutFittingCompressedSize.height
+        )
+        let size = hostingController.sizeThatFits(in: target)
+        return CGSize(width: target.width, height: ceil(size.height))
     }
 }

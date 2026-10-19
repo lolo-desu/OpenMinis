@@ -945,7 +945,7 @@ private struct MinisTextView: UIViewRepresentable {
     let text: String
 
     func makeUIView(context: Context) -> UITextView {
-        let textView = UITextView(usingTextLayoutManager: true)
+        let textView: UITextView = { if #available(iOS 16.0, *) { return UITextView(usingTextLayoutManager: true) } else { return UITextView() } }()
         textView.isEditable = false
         textView.isSelectable = true
         textView.backgroundColor = .clear

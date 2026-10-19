@@ -70,19 +70,18 @@ struct SwipeToSendHint: View {
 
 // MARK: - Flow Layout
 
-/// A custom Layout that arranges subviews in a wrapping horizontal flow.
-private struct FlowLayout: Layout {
+@available(iOS 16.0, *)
+private struct NativeFlowLayout: Layout {
     var hSpacing: CGFloat = 8
     var vSpacing: CGFloat = 8
     var alignment: HorizontalAlignment = .leading
 
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+    func sizeThatFits(proposal: SwiftUI.ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let result = arrange(proposal: proposal, subviews: subviews)
-        // Use the full proposed width so the layout fills its container.
         return CGSize(width: proposal.width ?? result.size.width, height: result.size.height)
     }
 
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+    func placeSubviews(in bounds: CGRect, proposal: SwiftUI.ProposedViewSize, subviews: Subviews, cache: inout ()) {
         let result = arrange(proposal: proposal, subviews: subviews)
         let containerWidth = bounds.width
         for (index, position) in result.positions.enumerated() {
@@ -95,7 +94,7 @@ private struct FlowLayout: Layout {
             }
             subviews[index].place(
                 at: CGPoint(x: bounds.minX + xOffset, y: bounds.minY + position.y),
-                proposal: ProposedViewSize(result.sizes[index])
+                proposal: SwiftUI.ProposedViewSize(result.sizes[index])
             )
         }
     }
@@ -108,7 +107,7 @@ private struct FlowLayout: Layout {
         var rowIndices: [Int]
     }
 
-    private func arrange(proposal: ProposedViewSize, subviews: Subviews) -> ArrangeResult {
+    private func arrange(proposal: SwiftUI.ProposedViewSize, subviews: Subviews) -> ArrangeResult {
         let maxWidth = proposal.width ?? .infinity
         var positions: [CGPoint] = []
         var sizes: [CGSize] = []
@@ -118,19 +117,16 @@ private struct FlowLayout: Layout {
         var y: CGFloat = 0
         var rowHeight: CGFloat = 0
         var totalWidth: CGFloat = 0
-        var currentRowStart = 0
         var currentRow = 0
 
-        for (i, subview) in subviews.enumerated() {
+        for subview in subviews {
             let size = subview.sizeThatFits(.unspecified)
             if x + size.width > maxWidth, x > 0 {
-                // Finish current row
                 rowWidths.append(x - hSpacing)
                 currentRow += 1
                 x = 0
                 y += rowHeight + vSpacing
                 rowHeight = 0
-                currentRowStart = i
             }
             positions.append(CGPoint(x: x, y: y))
             sizes.append(size)
@@ -139,7 +135,6 @@ private struct FlowLayout: Layout {
             x += size.width + hSpacing
             totalWidth = max(totalWidth, x - hSpacing)
         }
-        // Last row
         if !subviews.isEmpty {
             rowWidths.append(x - hSpacing)
         }
@@ -151,6 +146,25 @@ private struct FlowLayout: Layout {
             rowWidths: rowWidths,
             rowIndices: rowIndices
         )
+    }
+}
+
+private struct FlowLayout<Content: View>: View {
+    var hSpacing: CGFloat = 8
+    var vSpacing: CGFloat = 8
+    var alignment: HorizontalAlignment = .leading
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        if #available(iOS 16.0, *) {
+            NativeFlowLayout(hSpacing: hSpacing, vSpacing: vSpacing, alignment: alignment) {
+                content()
+            }
+        } else {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 64), spacing: hSpacing)], alignment: alignment, spacing: vSpacing) {
+                content()
+            }
+        }
     }
 }
 
