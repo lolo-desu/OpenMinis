@@ -1,5 +1,4 @@
 import SwiftUI
-import PhotosUI
 
 /// Settings page for SOUL.md — Minis's persistent personality file.
 /// Lives between Skills and Memory in the Agent Runtime section.

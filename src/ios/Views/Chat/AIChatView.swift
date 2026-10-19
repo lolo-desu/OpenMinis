@@ -2,9 +2,7 @@ import AVFoundation
 import AVKit
 import Combine
 import GameController
-import PhotosUI
-import QuickLook
-import QuickLook
+import Photos
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
@@ -971,15 +969,18 @@ struct AIChatView: View {
         .sheet(item: $previewMarkdownFile) { fileURL in
             MinisMarkdownPreviewView(fileURL: fileURL)
         }
-        // [T-ios-office-preview-toolbar] Present documents (pdf/docx/xlsx/…)
-        // with SwiftUI's native QuickLook presentation instead of embedding a
-        // bare QLPreviewController in a .sheet. Inside a sheet QL is a child
-        // of the hosting controller, not "the presented controller", so it
-        // installs none of its system chrome — users got a page indicator and
-        // no Share/Done at all. .quickLookPreview presents the controller
-        // itself full-screen, which brings the standard toolbar (Done, share
-        // sheet, markup where supported) exactly as in Files.app.
-        .quickLookPreview($previewDocumentFile)
+        .sheet(item: $previewDocumentFile) { fileURL in
+            NavigationStack {
+                AttachmentPreviewView(url: fileURL)
+                    .navigationTitle(fileURL.lastPathComponent)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { previewDocumentFile = nil }
+                        }
+                    }
+            }
+        }
         .sheet(item: $shareFile) { fileURL in
             MinisShareSheet(url: fileURL)
         }

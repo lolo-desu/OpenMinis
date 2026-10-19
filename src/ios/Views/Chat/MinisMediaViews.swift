@@ -1,7 +1,6 @@
 import SwiftUI
 import AVKit
 import Photos
-import QuickLook
 
 
 private let minisLogger = AppLogger(category: "MinisMedia")

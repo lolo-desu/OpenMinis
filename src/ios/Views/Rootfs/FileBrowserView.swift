@@ -7,7 +7,6 @@
 
 import SwiftUI
 import UIKit
-import QuickLook
 import WebKit
 import FileProvider
 
@@ -404,7 +403,7 @@ private func richPreviewKind(for item: FileItem) -> RichPreviewKind {
                 return .text
             }
         }
-        if QLPreviewController.canPreview(url as NSURL) {
+        if AttachmentPreviewView.canPreview(url: url) {
             return .quickLook
         }
         return .info
