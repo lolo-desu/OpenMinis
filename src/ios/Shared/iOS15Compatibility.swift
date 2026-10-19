@@ -465,27 +465,17 @@ extension View {
     }
 
     @_disfavoredOverload
-    @ViewBuilder
     public func draggable(_ payload: @autoclosure @escaping () -> String) -> some View {
-        if #available(iOS 16.0, *) {
-            self.draggable(payload())
-        } else {
-            self
-        }
+        self
     }
 
     @_disfavoredOverload
-    @ViewBuilder
     public func dropDestination(
         for payloadType: String.Type = String.self,
         action: @escaping ([String], CGPoint) -> Bool,
         isTargeted: @escaping (Bool) -> Void = { _ in }
     ) -> some View {
-        if #available(iOS 16.0, *) {
-            self.dropDestination(for: payloadType, action: action, isTargeted: isTargeted)
-        } else {
-            self
-        }
+        self
     }
 }
 

@@ -3250,7 +3250,7 @@ struct ContentView: View {
             // with a hand-rolled gesture sequence — the
             // gesture layer is where system gestures are
             // beaten (see the WebView sheet-dismiss fix).
-            .draggable(session.id)
+            // .draggable removed for iOS 15 (drag session row)
             .overlay {
                 if regeneratingTitleSessionId == session.id {
                     ZStack {
@@ -3452,7 +3452,7 @@ struct ContentView: View {
                                 // with a hand-rolled gesture sequence — the
                                 // gesture layer is where system gestures are
                                 // beaten (see the WebView sheet-dismiss fix).
-                                .draggable(session.id)
+                                // .draggable removed for iOS 15 (drag session row)
                                 .overlay {
                                     if regeneratingTitleSessionId == session.id {
                                         ZStack {
