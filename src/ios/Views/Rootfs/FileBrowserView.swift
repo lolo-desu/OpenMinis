@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import QuickLook
 import WebKit
 import FileProvider
 

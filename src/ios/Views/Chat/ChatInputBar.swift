@@ -595,6 +595,10 @@ struct PastedTextChipRow: View {
 struct AttachmentPreviewView: UIViewControllerRepresentable {
     let url: URL
 
+    static func canPreview(url: URL) -> Bool {
+        QLPreviewController.canPreview(url as NSURL)
+    }
+
     func makeUIViewController(context: Context) -> QLPreviewController {
         let controller = QLPreviewController()
         controller.dataSource = context.coordinator
