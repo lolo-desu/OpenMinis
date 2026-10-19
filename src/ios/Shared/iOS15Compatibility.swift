@@ -400,6 +400,62 @@ extension View {
     }
 }
 
+// MARK: - 6b. iOS 26 SDK Stubs for Xcode 16 (iOS 18 SDK) Compatibility
+
+public struct Glass: Sendable {
+    public static let regular = Glass()
+    public func tint(_ color: Color?) -> Glass { self }
+    public func interactive(_ isInteractive: Bool = true) -> Glass { self }
+}
+
+public enum CompatGlassShape: Sendable {
+    case capsule
+    case circle
+}
+
+public enum CompatToolbarVisibility: Sendable {
+    case automatic
+    case visible
+    case hidden
+}
+
+extension View {
+    @_disfavoredOverload
+    public func glassEffect(_ glass: Glass = .regular, in shape: CompatGlassShape) -> some View {
+        self
+    }
+
+    @_disfavoredOverload
+    public func glassEffect<S: Shape>(_ glass: Glass = .regular, in shape: S) -> some View {
+        self
+    }
+
+    @_disfavoredOverload
+    public func glassEffectID<ID: Hashable>(_ id: ID, in namespace: Namespace.ID) -> some View {
+        self
+    }
+
+    @_disfavoredOverload
+    public func scrollEdgeEffectHidden(_ hidden: Bool = true, for edges: Edge.Set = .all) -> some View {
+        self
+    }
+
+    @_disfavoredOverload
+    public func toolbarBackgroundVisibility(_ visibility: CompatToolbarVisibility, for bars: CompatToolbarPlacement...) -> some View {
+        self
+    }
+
+    @_disfavoredOverload
+    public func contentShape(_ shape: CompatGlassShape) -> some View {
+        switch shape {
+        case .capsule:
+            return AnyView(self.contentShape(Capsule()))
+        case .circle:
+            return AnyView(self.contentShape(Circle()))
+        }
+    }
+}
+
 // MARK: - 7. NavigationStack & NavigationSplitView Backport for iOS 15
 
 public struct CompatNavigationPath: Equatable {

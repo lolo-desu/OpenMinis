@@ -16,6 +16,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Set up Go 1.25+
+        uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.25.0'
+          check-latest: true
+
       - name: Select Xcode & Check Versions
         run: |
           xcodebuild -version
@@ -36,7 +42,7 @@ jobs:
             deps/libs
             deps/include
             deps/resources
-          key: ios15-native-deps-v1-${{ hashFiles('deps/build_lame.sh', 'deps/build_ffmpeg.sh', 'deps/build_ish.sh', 'deps/prepare_alpine_rootfs.sh', 'deps/build_rclone_ios.sh', '.gitmodules') }}
+          key: ios15-native-deps-v2-${{ hashFiles('deps/build_lame.sh', 'deps/build_ffmpeg.sh', 'deps/build_ish.sh', 'deps/prepare_alpine_rootfs.sh', 'deps/build_rclone_ios.sh', '.gitmodules') }}
 
       - name: Build Native Dependencies (if not cached)
         if: steps.cache-deps.outputs.cache-hit != 'true'
@@ -76,7 +82,6 @@ jobs:
         run: |
           APP_PATH=$(find build/DerivedData/Build/Products/Release-iphoneos -maxdepth 1 -name "Minis.app" | head -n 1)
           echo "Found app at: $APP_PATH"
-          # Remove iOS 16+ extensions from PlugIns if desired, or keep them (iOS 15 ignores higher-OS appex, but removing them ensures 100% compatibility with all sideloaders like TrollStore / AltStore / Sideloadly / ESign)
           rm -rf "$APP_PATH/PlugIns/AgentWidgetExtension.appex"
           rm -rf "$APP_PATH/PlugIns/MinisFileProvider.appex"
           mkdir -p build/ipa/Payload

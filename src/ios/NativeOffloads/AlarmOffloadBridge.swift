@@ -474,4 +474,36 @@ private final class AlarmLabelStore {
     }
 }
 
+#else
+
+@objc public class AlarmOffloadBridge: NSObject {
+    private static var unavailableError: NSError {
+        NSError(domain: "AlarmOffload", code: -1, userInfo: [NSLocalizedDescriptionKey: "AlarmKit is not available on this iOS version."])
+    }
+
+    @objc public static func requestAuthorization(completion: @escaping (Bool, Error?) -> Void) {
+        completion(false, unavailableError)
+    }
+
+    @objc public static func scheduleAlarm(withId alarmId: String, fireDate: Date, label: String, repeatMode: String, completion: @escaping (NSDictionary?, Error?) -> Void) {
+        completion(nil, unavailableError)
+    }
+
+    @objc public static func scheduleTimer(withId timerId: String, duration: TimeInterval, label: String, completion: @escaping (NSDictionary?, Error?) -> Void) {
+        completion(nil, unavailableError)
+    }
+
+    @objc public static func listAlarms(completion: @escaping (NSArray?, Error?) -> Void) {
+        completion([], nil)
+    }
+
+    @objc public static func cancelAlarm(withId alarmId: String, completion: @escaping (Bool, Error?) -> Void) {
+        completion(false, unavailableError)
+    }
+
+    @objc public static func cancelAllAlarms(completion: @escaping (Int, Error?) -> Void) {
+        completion(0, unavailableError)
+    }
+}
+
 #endif // canImport(AlarmKit)
