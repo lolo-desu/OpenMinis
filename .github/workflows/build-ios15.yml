@@ -29,27 +29,50 @@ jobs:
 
       - name: Install Build Dependencies
         run: |
-          brew install ninja llvm libarchive pkg-config
+          brew install ninja llvm lld libarchive pkg-config
+          ln -sf /opt/homebrew/opt/lld/bin/ld.lld /opt/homebrew/opt/llvm/bin/ld.lld || true
+          ln -sf /opt/homebrew/opt/lld/bin/lld /opt/homebrew/opt/llvm/bin/lld || true
+          echo "/opt/homebrew/opt/lld/bin" >> $GITHUB_PATH
+          echo "/opt/homebrew/opt/llvm/bin" >> $GITHUB_PATH
           pip3 install --break-system-packages meson || pip3 install meson
 
-      - name: Cache Native Dependencies
-        id: cache-deps
+      - name: Cache LAME & FFmpeg
+        id: cache-ffmpeg
         uses: actions/cache@v4
         with:
           path: |
             deps/lame-build
-            deps/frameworks
-            deps/libs
-            deps/include
-            deps/resources
-          key: ios15-native-deps-v2-${{ hashFiles('deps/build_lame.sh', 'deps/build_ffmpeg.sh', 'deps/build_ish.sh', 'deps/prepare_alpine_rootfs.sh', 'deps/build_rclone_ios.sh', '.gitmodules') }}
+            deps/frameworks/FFmpeg.framework
+            deps/frameworks/libavcodec.framework
+            deps/frameworks/libavformat.framework
+            deps/frameworks/libavutil.framework
+            deps/frameworks/libavfilter.framework
+            deps/frameworks/libswresample.framework
+            deps/frameworks/libswscale.framework
+          key: ios15-ffmpeg-v2-${{ hashFiles('deps/build_lame.sh', 'deps/build_ffmpeg.sh') }}
 
-      - name: Build Native Dependencies (if not cached)
-        if: steps.cache-deps.outputs.cache-hit != 'true'
+      - name: Build LAME & FFmpeg (if not cached)
+        if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
         run: |
           xcodebuild -downloadComponent MetalToolchain || true
           ./deps/build_lame.sh
           ./deps/build_ffmpeg.sh
+
+      - name: Cache iSH, Rootfs & Rclone
+        id: cache-ish
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps/libs
+            deps/include
+            deps/resources
+            deps/frameworks/Rclone.xcframework
+          key: ios15-ish-rclone-v2-${{ hashFiles('deps/build_ish.sh', 'deps/prepare_alpine_rootfs.sh', 'deps/build_rclone_ios.sh', '.gitmodules') }}
+
+      - name: Build iSH, Rootfs & Rclone (if not cached)
+        if: steps.cache-ish.outputs.cache-hit != 'true'
+        run: |
+          export PATH="/opt/homebrew/opt/lld/bin:/opt/homebrew/opt/llvm/bin:$PATH"
           ./deps/build_ish.sh
           ./deps/prepare_alpine_rootfs.sh
           ./deps/build_rclone_ios.sh
