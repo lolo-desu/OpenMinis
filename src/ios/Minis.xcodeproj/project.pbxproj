@@ -3630,10 +3630,6 @@
 					"-lish_emu",
 					"-lish",
 					"-lfakefs",
-					"-Wl,-weak_framework,AppIntents",
-					"-Wl,-weak_framework,WeatherKit",
-					"-Wl,-weak_framework,ActivityKit",
-					"-Wl,-weak_framework,CoreTransferable",
 				);
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app;
@@ -3688,10 +3684,6 @@
 					"-lish_emu",
 					"-lish",
 					"-lfakefs",
-					"-Wl,-weak_framework,AppIntents",
-					"-Wl,-weak_framework,WeatherKit",
-					"-Wl,-weak_framework,ActivityKit",
-					"-Wl,-weak_framework,CoreTransferable",
 				);
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.openminis.app;
