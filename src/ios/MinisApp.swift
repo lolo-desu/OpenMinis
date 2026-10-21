@@ -116,6 +116,15 @@ struct MinisApp: App {
         LaunchTrace.beginSession()
         let _ = LaunchTrace.mark("init:begin")
 
+        // [T-appgroup-container-nil-trap] Record whether this process was
+        // actually granted the App Group. That single fact explained the
+        // iOS 15.4.1 launch trap and is invisible in a crash log until
+        // something has already dereferenced the nil.
+        let groupPath = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: SharedContainerStore.appGroupID
+        )?.path ?? "NIL (falling back to sandbox)"
+        LaunchTrace.note("appGroup=" + groupPath)
+
         // [T-ios-mac-uncaught-nsexception] FIRST statement in the process's own
         // code — before any subsystem gets a chance to throw.
         //
@@ -1185,7 +1194,10 @@ struct MinisApp: App {
     private static func migrateSharedDirToAppGroup() {
         let fm = FileManager.default
         let library = fm.urls(for: .libraryDirectory, in: .userDomainMask).first!
-        let container = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.com.openminis.app")!
+        // [T-appgroup-container-nil-trap] Same forced unwrap as minisAppGroupRoot;
+        // nil for unsigned sideloads. Use the shared resolver so the migration
+        // and the rest of the app agree on where the tree lives.
+        let container = AIChatViewModel.appGroupContainer
 
         let migrations: [(source: URL, dest: URL, label: String)] = [
             // Legacy Library/MinisChat/shared → new shared

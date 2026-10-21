@@ -133,6 +133,12 @@ jobs:
           echo "Found app at: $APP_PATH"
           rm -rf "$APP_PATH/PlugIns/AgentWidgetExtension.appex"
           rm -rf "$APP_PATH/PlugIns/MinisFileProvider.appex"
+          # [T-appgroup-container-nil-trap] Also drop the share extension.
+          # It declares the same App Group, which an unsigned TrollStore
+          # install cannot be granted; an appex whose group is missing is a
+          # launch-time liability while we are still isolating why the host
+          # process traps. Restore once the app itself boots cleanly.
+          rm -rf "$APP_PATH/PlugIns/MinisShare.appex"
           mkdir -p build/ipa/Payload
           cp -R "$APP_PATH" build/ipa/Payload/
           cd build/ipa
