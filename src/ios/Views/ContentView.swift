@@ -1622,7 +1622,6 @@ struct ContentView: View {
 
     var body: some View {
         GeometryReader { geo in
-            LaunchTrace.mark("ContentView.body geo=\(Int(geo.size.width))x\(Int(geo.size.height))")
             let wide = isIPad && geo.size.width >= compactThreshold
             Group {
                 if wide {
@@ -1643,6 +1642,7 @@ struct ContentView: View {
                 isWideLayout = newWide
             }
             .onAppear {
+                let _ = LaunchTrace.mark("ContentView.onAppear \(Int(geo.size.width))x\(Int(geo.size.height)) wide=\(wide)")
                 isWideLayout = wide
                 wireMenuActions()
                 wireFABActions()
@@ -2475,7 +2475,7 @@ struct ContentView: View {
         // in SwiftUI's transaction flush; an A/B test confirmed the font
         // injection is not its cause), so per-column injection is safe here.
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            LaunchTrace.mark("splitLayout:sidebar")
+            let _ = LaunchTrace.mark("splitLayout:sidebar")
             sessionList(useNavigationLinks: false)
                 .appFontScale()
         } detail: {
@@ -2488,7 +2488,7 @@ struct ContentView: View {
 
     private var stackLayout: some View {
         NavigationStack(path: $navigationPath) {
-            LaunchTrace.mark("stackLayout:sessionList")
+            let _ = LaunchTrace.mark("stackLayout:sessionList")
             sessionList(useNavigationLinks: true)
                 .navigationDestination(for: String.self) { id in
                     // `.id(id)` mirrors detailView (iPad): navigationDestination
