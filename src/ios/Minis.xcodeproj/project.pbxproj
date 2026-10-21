@@ -26,6 +26,7 @@
 		A11Y0001 /* ChatAccessibilityAnnouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11Y0002 /* ChatAccessibilityAnnouncer.swift */; };
 		A1B2C3D4E5F60718293A4B5C /* SystemVoiceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5D /* SystemVoiceCatalog.swift */; };
 		AA0838A02F3B941A00049557 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0838A12F3B941A00049557 /* AboutView.swift */; };
+		E5LTV0002 /* LaunchTraceViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5LTV0012 /* LaunchTraceViewer.swift */; };
 		AA0838C02F3B941A00049557 /* RootfsResetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0838BF2F3B941A00049557 /* RootfsResetButton.swift */; };
 		AA0838C32F3B941A00049557 /* RootfsManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0838BE2F3B941A00049557 /* RootfsManagementView.swift */; };
 		AA0838CC2F3B941A00049557 /* StorageManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0838CD2F3B941A00049557 /* StorageManagementView.swift */; };
@@ -192,6 +193,7 @@
 		E5CKB0001 /* CookieBackupStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CKB0002 /* CookieBackupStore.swift */; };
 		E5CR00001 /* ShellCommandRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CR00011 /* ShellCommandRingBuffer.swift */; };
 		E5CR00002 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CR00012 /* CrashReporter.swift */; };
+		E5LT00002 /* LaunchTrace.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5LT00012 /* LaunchTrace.swift */; };
 		E5CR00003 /* CrashSignalHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E5CR00013 /* CrashSignalHandler.m */; };
 		E5D00001 /* ProviderTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D00011 /* ProviderTypes.swift */; };
 		E5D00002 /* ProviderInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D00012 /* ProviderInstance.swift */; };
@@ -653,6 +655,7 @@
 		A11Y0002 /* ChatAccessibilityAnnouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAccessibilityAnnouncer.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B5D /* SystemVoiceCatalog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SystemVoiceCatalog.swift; sourceTree = "<group>"; };
 		AA0838A12F3B941A00049557 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		E5LTV0012 /* LaunchTraceViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTraceViewer.swift; sourceTree = "<group>"; };
 		AA0838BE2F3B941A00049557 /* RootfsManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootfsManagementView.swift; sourceTree = "<group>"; };
 		AA0838BF2F3B941A00049557 /* RootfsResetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootfsResetButton.swift; sourceTree = "<group>"; };
 		AA0838CD2F3B941A00049557 /* StorageManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManagementView.swift; sourceTree = "<group>"; };
@@ -877,6 +880,7 @@
 		E5CKB0002 /* CookieBackupStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieBackupStore.swift; sourceTree = "<group>"; };
 		E5CR00011 /* ShellCommandRingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellCommandRingBuffer.swift; sourceTree = "<group>"; };
 		E5CR00012 /* CrashReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporter.swift; sourceTree = "<group>"; };
+		E5LT00012 /* LaunchTrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTrace.swift; sourceTree = "<group>"; };
 		E5CR00013 /* CrashSignalHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CrashSignalHandler.m; sourceTree = "<group>"; };
 		E5CR00014 /* CrashSignalHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CrashSignalHandler.h; sourceTree = "<group>"; };
 		E5D00011 /* ProviderTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderTypes.swift; sourceTree = "<group>"; };
@@ -1805,6 +1809,7 @@
 				E5RSD0011 /* ResourceDiagnostics.swift */,
 				E5PPB0011 /* PerfProbe.swift */,
 				E5CR00012 /* CrashReporter.swift */,
+				E5LT00012 /* LaunchTrace.swift */,
 				E5CR00014 /* CrashSignalHandler.h */,
 				E5CR00013 /* CrashSignalHandler.m */,
 			);
@@ -2318,6 +2323,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0838A12F3B941A00049557 /* AboutView.swift */,
+				E5LTV0012 /* LaunchTraceViewer.swift */,
 				E5S000014 /* CloudSyncSettingsView.swift */,
 				E5G000013 /* EnhancedBackgroundSettingsView.swift */,
 				E5P000012 /* EnvironmentVariablesView.swift */,
@@ -2793,6 +2799,7 @@
 				E54000AC1 /* DebugSkillGenerated.swift in Sources */,
 				E5FP00100 /* AppGroupChangeWatcher.swift in Sources */,
 				AA0838A02F3B941A00049557 /* AboutView.swift in Sources */,
+				E5LTV0002 /* LaunchTraceViewer.swift in Sources */,
 				BB1000100F700000000000AA /* ContextPolicy.swift in Sources */,
 				AADDA9E12F6ECCF400B66649 /* ThumbnailCache.swift in Sources */,
 				E51000002 /* ContentView.swift in Sources */,
@@ -2952,6 +2959,7 @@
 				E5RSD0001 /* ResourceDiagnostics.swift in Sources */,
 				E5PPB0001 /* PerfProbe.swift in Sources */,
 				E5CR00002 /* CrashReporter.swift in Sources */,
+				E5LT00002 /* LaunchTrace.swift in Sources */,
 				E5CR00003 /* CrashSignalHandler.m in Sources */,
 				E5KVC0003 /* SafeKVCSetTrue.m in Sources */,
 				E5F100001 /* NetworkMonitor.swift in Sources */,

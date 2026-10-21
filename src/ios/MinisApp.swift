@@ -109,6 +109,13 @@ struct MinisApp: App {
     @State private var backgroundEntryDate: Date?
 
     init() {
+        // [T-ios15-launch-trace] Absolutely first: open the breadcrumb log,
+        // record the OS/device/bundle, and arm the trap handlers. Every later
+        // stage marks itself before running, so the last line of
+        // Documents/launch-trace.log names whatever killed the process.
+        LaunchTrace.beginSession()
+        LaunchTrace.mark("init:begin")
+
         // [T-ios-mac-uncaught-nsexception] FIRST statement in the process's own
         // code — before any subsystem gets a chance to throw.
         //
@@ -128,6 +135,7 @@ struct MinisApp: App {
         //
         // `install` is idempotent, so the later onAppLaunch() call is a no-op.
         CrashSignalHandler.install()
+        LaunchTrace.mark("init:CrashSignalHandler")
         // [T-auto-grouping-default-on] Auto-grouping ships ON. `bool(forKey:)`
         // returns false for an unregistered key, so the default has to be
         // registered here rather than expressed at the (multiple) read sites —
@@ -139,9 +147,11 @@ struct MinisApp: App {
         // into a group the user already created, only when the model is
         // confident, only once per chat, and never over a hand-filed session
         // (setFolderIfUnfiled). Android defaults ON to match.
+        LaunchTrace.mark("init:registerDefaults")
         UserDefaults.standard.register(defaults: ["autoGroupingEnabled": true])
         // [T-voice-input-mode-preference-ios] Pin the lazy static to the real
         // launch instant.
+        LaunchTrace.mark("init:processLaunchedAt")
         _ = Self.processLaunchedAt
         #if DEBUG
         try? debugServer.start(port: 8321)
@@ -150,10 +160,13 @@ struct MinisApp: App {
         // UITextView gets created. Breaks the iOS 26 TextKit1 fillLayoutHole
         // storm that has caused 0x8BADF00D scene-update watchdog kills on
         // markdown tables during streaming.
+        LaunchTrace.mark("init:NSTextContainerGuard")
         NSTextContainerSetSizeGuard.install()
         // Enable in-app language override for String(localized:) and UIKit strings
+        LaunchTrace.mark("init:enableLanguageOverride")
         Bundle.enableLanguageOverride()
         let lang = UserDefaults.standard.string(forKey: "appLanguage") ?? ""
+        LaunchTrace.mark("init:setLanguage(\(lang))")
         Bundle.setLanguage(lang.isEmpty ? nil : lang)
         // [T-ios-soul-name-sidebar-stale] Pre-load cachedMetadata synchronously so
         // ContentView's `@State soulName` gets the real SOUL.md name on its very
@@ -161,16 +174,22 @@ struct MinisApp: App {
         // @State initializer (evaluated at ContentView instantiation, before any
         // .onAppear refresh) locks the sidebar title to the default even when the
         // user set a custom name. refreshCache() only reads the tiny SOUL.md file.
+        LaunchTrace.mark("init:SoulStore.refreshCache")
         SoulStore.refreshCache()
+        LaunchTrace.mark("init:SoulStore done")
         // Pre-warm KaTeX WKWebView as fallback for formulas SwiftMath can't render
+        LaunchTrace.mark("init:KaTeXRenderer.warmUp")
         KaTeXRenderer.shared.warmUp()
+        LaunchTrace.mark("init:KaTeX done")
         // Pre-warm the biometric capability probe off the main thread. The
         // first LAContext.canEvaluatePolicy call cold-starts the
         // LocalAuthentication XPC daemon (~500 ms); without this it would run
         // inline on the first sessionContextMenu builder during scroll and
         // hang a frame. (T-ios-biometric-probe-scroll-hang)
+        LaunchTrace.mark("init:BiometricAuth.prewarm")
         BiometricAuth.prewarm()
         // Clean up Live Activities left over from a previous app session (e.g. app was killed)
+        LaunchTrace.mark("init:cleanupStaleActivities")
         AgentLiveActivityManager.shared.cleanupStaleActivities(source: "MinisApp.init")
         // Start screen-awake controller — it will observe running tasks
         // + the user's opt-in flag and toggle the idle timer accordingly.
@@ -211,6 +230,7 @@ struct MinisApp: App {
 
     var body: some Scene {
         WindowGroup {
+            LaunchTrace.mark("body:WindowGroup content")
             ZStack {
                 ContentView()
                     .overlay(alignment: .top) {

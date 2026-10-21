@@ -109,6 +109,12 @@ struct AboutView: View {
                 .listRowBackground(Color.clear)
             }
 
+            // [T-ios15-launch-trace] Breadcrumb log — the only diagnostic
+            // that survives a launch-time trap without a crash report.
+            Section("Diagnostics") {
+                LaunchTraceRow()
+            }
+
             // MARK: - Links
             Section("Links") {
                 Link(destination: URL(string: "https://github.com/OpenMinis")!) {
