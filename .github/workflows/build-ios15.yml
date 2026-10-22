@@ -144,6 +144,15 @@ jobs:
           cd build/ipa
           zip -r9 ../Minis-iOS15-unsigned.ipa Payload
 
+      - name: Verify iOS 15 compatibility of the binary
+        run: |
+          # A green xcodebuild proves nothing about iOS 15 compatibility: the
+          # binary can still reference iOS 16 frameworks, or a plug-in can pull
+          # MinimumOSVersion back up to 16.0. This gate is what makes the port
+          # safe to sync with upstream unattended (see
+          # docs/ios15_backport/sync-playbook.md).
+          python3 scripts/verify_ios15_ipa.py build/Minis-iOS15-unsigned.ipa --sources src/ios
+
       - name: Upload Unsigned IPA Artifact
         uses: actions/upload-artifact@v4
         with:
